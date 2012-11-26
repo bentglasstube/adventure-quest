@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Adventure Quest</string>
+  <string name="stat_level">Level %u</string>
+  <string name="status_failed">Failed</string>
+  <string name="status_compelte">Complete</string>
+  <string name="status_progress">Complete in %s</string>
+  <string name="action_abandon">Abandon Quest</string>
+  <string name="action_new">New Quest</string>
+</resources>
