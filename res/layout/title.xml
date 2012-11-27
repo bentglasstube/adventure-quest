@@ -47,6 +47,7 @@
       android:layout_weight="1" />
     <Button android:id="@+id/quest_action"
       android:text="Abandon quest"
+      android:onClick="onAction"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content" />
   </LinearLayout>
