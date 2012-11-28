@@ -10,4 +10,5 @@
   <string name="action_abandon">Abandon Quest</string>
   <string name="action_new">New Quest</string>
   <string name="welcome">Welcome to Adventure Quest!  Press the button below to start your epic journey.</string>
+  <string name="notification">Quest complete!</string>
 </resources>

@@ -30,16 +30,13 @@ additional day per level.  Anyway, good luck with that.
 Features
 --------
 
-The game shouldn't use any battery while you aren't using it because it
-literally does nothing at all.  This may change in the future if I add
-notifications.
-
-The quest generator is awesome.
+ * Minimal battery usage
+ * Awesome quest generator
+ * Quest notifications with awesome sound effect
 
 Upcoming Features
 -----------------
 
- * Notifications when a quest is finished
  * Pictures to go with each quest
  * Early failures
  * More data for the quest generator

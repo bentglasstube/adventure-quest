@@ -1,13 +1,15 @@
 package org.eatabrick.adventurequest;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -15,27 +17,25 @@ import java.lang.Math;
 import java.util.Random;
 
 public class TitleActivity extends Activity {
+  private static final int QUEST_NONE     = 0;
+  private static final int QUEST_FAILED   = 1;
+  private static final int QUEST_COMPLETE = 2;
+  private static final int QUEST_PROGRESS = 3;
+  private static final int QUEST_ABANDON  = 4;
+  private static final int LEVEL_BASE     = 300000;
+
   private SharedPreferences settings;
+  private Random rng = new Random();
+  private CountDownTimer timer;
+  private AlarmManager alarm;
+  private PendingIntent completeIntent;
 
   private int charLevel;
   private int charXP;
-
-  private String questTitle;
   private String questDescription;
   private long questEnd;
   private int questXP;
   private int questStatus;
-
-  static int QUEST_NONE     = 0;
-  static int QUEST_FAILED   = 1;
-  static int QUEST_COMPLETE = 2;
-  static int QUEST_PROGRESS = 3;
-  static int QUEST_ABANDON  = 4;
-
-  static int LEVEL_BASE = 300000;
-
-  private Random rng = new Random();
-  private CountDownTimer timer;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -45,6 +45,8 @@ public class TitleActivity extends Activity {
     ((TextView) findViewById(R.id.quest_description)).setMovementMethod(new ScrollingMovementMethod());
 
     settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+    alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+    completeIntent = PendingIntent.getBroadcast(this, 0, new Intent(this, CompleteReceiver.class), 0);
   }
 
   @Override public void onResume() {
@@ -52,12 +54,23 @@ public class TitleActivity extends Activity {
 
     loadGame();
     updateDisplay();
+    setNotify(false);
   }
 
   @Override public void onPause() {
     super.onPause();
 
     saveGame();
+    timer.cancel();
+    setNotify(true);
+  }
+
+  public void setNotify(boolean notify) {
+    SharedPreferences.Editor editor = settings.edit();
+
+    editor.putBoolean("notify", notify);
+
+    editor.apply();
   }
 
   public void onAction(View v) {
@@ -168,6 +181,9 @@ public class TitleActivity extends Activity {
           completeQuest();
         }
       }.start();
+
+      // set alarm for notification
+      alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, questEnd, completeIntent);
     } else {
       completeQuest();
     }
@@ -188,8 +204,6 @@ public class TitleActivity extends Activity {
     String quest = randomStringFromArray("quest_base");
 
     while (quest.indexOf("[") > -1) {
-      Log.d("AdventureQuest", quest);
-
       int start = quest.indexOf("[");
       int end   = quest.indexOf("]");
 
@@ -218,21 +232,22 @@ public class TitleActivity extends Activity {
   }
 
   private void completeQuest() {
-    // 10% chance of failure
-    if (rng.nextFloat() > 0.10) {
-      charXP += questXP;
-      if (charXP > 100) {
-        charXP -= 100;
-        charLevel += 1;
-      }
+    if (questEnd > 0) {
+      // 10% chance of failure
+      if (rng.nextFloat() > 0.10) {
+        charXP += questXP;
+        if (charXP > 100) {
+          charXP -= 100;
+          charLevel += 1;
+        }
 
-      questEnd = 0;
-      questStatus = QUEST_COMPLETE;
-    } else {
-      questEnd = 0;
-      questStatus = QUEST_FAILED;
+        questStatus = QUEST_COMPLETE;
+      } else {
+        questStatus = QUEST_FAILED;
+      }
     }
 
+    questEnd = 0;
     updateDisplay();
   }
 
