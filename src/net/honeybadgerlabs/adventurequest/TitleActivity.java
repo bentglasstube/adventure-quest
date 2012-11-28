@@ -70,7 +70,7 @@ public class TitleActivity extends Activity {
 
     editor.putBoolean("notify", notify);
 
-    editor.apply();
+    editor.commit();
   }
 
   public void onAction(View v) {
@@ -103,7 +103,7 @@ public class TitleActivity extends Activity {
     editor.putLong("quest_end", questEnd);
     editor.putInt("quest_xp", questXP);
 
-    editor.apply();
+    editor.commit();
   }
 
   private void setText(int id, String text) {
