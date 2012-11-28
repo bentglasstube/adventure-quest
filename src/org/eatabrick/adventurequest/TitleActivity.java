@@ -7,6 +7,7 @@ import android.os.CountDownTimer;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +31,8 @@ public class TitleActivity extends Activity {
   static int QUEST_COMPLETE = 2;
   static int QUEST_PROGRESS = 3;
   static int QUEST_ABANDON  = 4;
+
+  static int LEVEL_BASE = 300000;
 
   private Random rng = new Random();
   private CountDownTimer timer;
@@ -69,8 +72,7 @@ public class TitleActivity extends Activity {
     charLevel = settings.getInt("char_level", 1);
     charXP    = settings.getInt("char_xp", 0);
 
-    questTitle       = settings.getString("quest_title", getString(R.string.welcome_title));
-    questDescription = settings.getString("quest_desc", getString(R.string.welcome_description));
+    questDescription = settings.getString("quest_desc", getString(R.string.welcome));
     questStatus      = settings.getInt("quest_status", QUEST_NONE);
     questEnd         = settings.getLong("quest_end", 0);
     questXP          = settings.getInt("quest_xp", 0);
@@ -83,7 +85,6 @@ public class TitleActivity extends Activity {
 
     editor.putInt("char_level", charLevel);
     editor.putInt("char_xp", charXP);
-    editor.putString("quest_title", questTitle);
     editor.putString("quest_desc", questDescription);
     editor.putInt("quest_status", questStatus);
     editor.putLong("quest_end", questEnd);
@@ -102,13 +103,12 @@ public class TitleActivity extends Activity {
 
   private void updateDisplay() {
     setText(R.id.stat_level, String.format(getString(R.string.stat_level), charLevel));
-    setText(R.id.quest_title, questTitle);
     setText(R.id.quest_description, questDescription);
 
     ((ProgressBar) findViewById(R.id.stat_experience)).setProgress(charXP);
 
     if (questStatus == QUEST_NONE) {
-      setText(R.id.quest_status, "");
+      setText(R.id.quest_status, R.string.status_none);
       setText(R.id.quest_action, R.string.action_new);
     } else if (questStatus == QUEST_FAILED) {
       setText(R.id.quest_status, R.string.status_failed);
@@ -150,9 +150,9 @@ public class TitleActivity extends Activity {
 
   private long timeToLevel(int currentLevel) {
     if (currentLevel > 60) {
-      return 442212000L + 864000000 * (currentLevel - 60);
+      return timeToLevel(60) + 864000000 * (currentLevel - 60);
     } else {
-      return 60000 * (long) (Math.pow(1.16, currentLevel));
+      return LEVEL_BASE * (long) (Math.pow(1.16, currentLevel));
     }
   }
 
@@ -173,15 +173,43 @@ public class TitleActivity extends Activity {
     }
   }
 
+  private String randomStringFromArray(String name) {
+    int id = getResources().getIdentifier(name, "array", getPackageName());
+
+    if (id == 0) {
+      return "{" + name + "}";
+    } else {
+      String[] array = getResources().getStringArray(id);
+      return array[rng.nextInt(array.length)];
+    }
+  }
+
+  private String generateQuestDescription() {
+    String quest = randomStringFromArray("quest_base");
+
+    while (quest.indexOf("[") > -1) {
+      Log.d("AdventureQuest", quest);
+
+      int start = quest.indexOf("[");
+      int end   = quest.indexOf("]");
+
+      String type = quest.substring(start + 1, end);
+      String replace = randomStringFromArray("quest_" + type);
+
+      quest = quest.substring(0, start) + replace + quest.substring(end + 1, quest.length());
+    }
+
+    return quest;
+  }
+
   private void beginQuest() {
     // pick time and xp
-    double factor = rng.nextDouble() / 2.0 + 0.25;
+    double factor = rng.nextDouble() / 5.0 + 0.2;
     long time = (long) ((double) timeToLevel(charLevel) * factor);
 
-    questTitle = "Testing";
-    questDescription = "This is just a test.";
+    questDescription = generateQuestDescription();
     questEnd = SystemClock.elapsedRealtime() + time;
-    questXP  = rng.nextInt(40) + 20;
+    questXP  = (int) (factor * 100);
 
     questStatus = QUEST_PROGRESS;
     updateDisplay();

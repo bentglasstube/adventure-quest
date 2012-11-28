@@ -6,8 +6,8 @@
   <string name="status_complete">Complete</string>
   <string name="status_progress">Complete in %s</string>
   <string name="status_abandon">Abandoned</string>
+  <string name="status_none">Welcome</string>
   <string name="action_abandon">Abandon Quest</string>
   <string name="action_new">New Quest</string>
-  <string name="welcome_title">Welcome</string>
-  <string name="welcome_description">Welcome to Adventure Quest!  Press the button below to start your epic journey.</string>
+  <string name="welcome">Welcome to Adventure Quest!  Press the button below to start your epic journey.</string>
 </resources>

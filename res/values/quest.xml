@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="quest_base">
+    <item>[subject] wants you to [adventure].</item>
+  </string-array>
+  <string-array name="quest_subject">
+    <item>[title] [name]</item>
+    <item>A [modifier] [person] named [name]</item>
+    <item>A [modifier] [person] named [name]</item>
+  </string-array>
+  <string-array name="quest_person">
+    <item>aristocrat</item>
+    <item>dwarf</item>
+    <item>elf</item>
+    <item>ex-adventurer</item>
+    <item>farmer</item>
+    <item>gnome</item>
+    <item>mercenary</item>
+    <item>merchant</item>
+    <item>peasant</item>
+    <item>pirate</item>
+    <item>sage</item>
+    <item>traveler</item>
+    <item>vagabond</item>
+    <item>wizard</item>
+  </string-array>
+  <string-array name="quest_object">
+    <item>[name], the [monster] [title]</item>
+    <item>a rival</item>
+    <item>the [enemy] [name]</item>
+    <item>the [group] of [name]</item>
+    <item>the [monster] of [place]</item>
+    <item>the pirates of the [name] Sea</item>
+  </string-array>
+  <string-array name="quest_enemy">
+    <item>murderer</item>
+    <item>scoundrel</item>
+    <item>thief</item>
+    <item>scalawag</item>
+    <item>vandal</item>
+    <item>cur</item>
+  </string-array>
+  <string-array name="quest_monster">
+    <item>Demon</item>
+    <item>Dragon</item>
+    <item>Vampire</item>
+    <item>Goblin</item>
+    <item>Orc</item>
+    <item>Troll</item>
+    <item>Kobold</item>
+  </string-array>
+  <string-array name="quest_group">
+    <item>warlocks</item>
+    <item>cultists</item>
+    <item>theives</item>
+    <item>traitors</item>
+  </string-array>
+  <string-array name="quest_modifier">
+    <item>shady</item>
+    <item>wealthy</item>
+    <item>cryptic</item>
+    <item>mysterious</item>
+    <item>dying</item>
+    <item>disgruntled</item>
+    <item>hoary</item>
+    <item>skittish</item>
+    <item>frantic</item>
+    <item>mysterious</item>
+    <item>worried</item>
+    <item>vacant</item>
+    <item>crippled</item>
+    <item>stocky</item>
+    <item>peg-legged</item>
+    <item>one-eyed</item>
+    <item>lecherous</item>
+    <item>destitute</item>
+    <item>ghostly</item>
+  </string-array>
+  <string-array name="quest_title">
+    <item>Lord</item>
+    <item>Lady</item>
+    <item>King</item>
+    <item>Queen</item>
+    <item>Prince</item>
+    <item>Princess</item>
+    <item>Count</item>
+    <item>Countess</item>
+    <item>Duke</item>
+    <item>Dutchess</item>
+  </string-array>
+  <string-array name="quest_adventure">
+    <item>expose the corruption of [title] [name]</item>
+    <item>assassinate [title] [name]</item>
+    <item>steal [item] from [object]</item>
+    <item>recover [item] from [object]</item>
+    <item>transport [item] to [place]</item>
+    <item>hunt down and capture [object]</item>
+    <item>hunt down and kill [object]</item>
+    <item>explore [place]</item>
+    <item>slay [object] and retrieve [item]</item>
+    <item>slay [object] and destroy [item]</item>
+    <item>rescue [title] [name] from [object]</item>
+    <item>investigate a star which fell into [place]</item>
+    <item>thwart the monstrous plan of [object]</item>
+    <item>find and explore [place]</item>
+    <item>discover who is assassinating his peers and why</item>
+    <item>escort [escort] safely to [place]</item>
+    <item>recover and destroy [item] from [place]</item>
+    <item>deliver [item] to [name] in [place]</item>
+    <item>travel to [place] and retrieve [item]</item>
+    <item>search [place] for treasure</item>
+    <item>collect [number] [garbage] from [place]</item>
+    <item>kill [number] of the nearby [beasts]</item>
+    <item>travel to [place] and defeat [object]</item>
+    <item>make peace with the people of [place]</item>
+    <item>aid the people of [place] against [object]</item>
+    <item>find out what killed all the [beasts] in [place]</item>
+  </string-array>
+  <string-array name="quest_item">
+    <item>the Relic of [name]</item>
+    <item>the Sword of [name]</item>
+    <item>the Amulet of [name]</item>
+    <item>a [adjective] device</item>
+    <item>a [adjective] artifact</item>
+  </string-array>
+  <string-array name="quest_number">
+    <item>12</item>
+    <item>20</item>
+    <item>25</item>
+    <item>40</item>
+    <item>50</item>
+    <item>75</item>
+    <item>100</item>
+    <item>200</item>
+    <item>250</item>
+    <item>500</item>
+    <item>100</item>
+  </string-array>
+  <string-array name="quest_garbage">
+    <item>berries</item>
+    <item>hides</item>
+    <item>feathers</item>
+    <item>gemstones</item>
+    <item>ingots</item>
+  </string-array>
+  <string-array name="quest_beasts">
+    <item>bears</item>
+    <item>rabbits</item>
+    <item>deer</item>
+    <item>fish</item>
+    <item>birds</item>
+    <item>wolves</item>
+    <item>foxes</item>
+    <item>pigs</item>
+    <item>boars</item>
+  </string-array>
+  <string-array name="quest_place">
+    <item>[name] [name]</item>
+    <item>the [name] [geo2]</item>
+    <item>the [geo] of [name]</item>
+    <item>Lake [name]</item>
+    <item>the town of [name]</item>
+    <item>the lost city of [name]</item>
+    <item>the ancient ruins of [name]</item>
+  </string-array>
+  <string-array name="quest_geo">
+    <item>Sea</item>
+    <item>Swamp</item>
+    <item>Forest</item>
+    <item>Mountains</item>
+    <item>Cavern</item>
+  </string-array>
+  <string-array name="quest_geo2">
+    <item>Tundra</item>
+    <item>Savannah</item>
+    <item>Woodlands</item>
+    <item>Caldera</item>
+    <item>[geo]</item>
+  </string-array>
+  <string-array name="quest_escort">
+    <item>a caravan of [adjective] goods</item>
+    <item>a locked chest</item>
+    <item>his daughter</item>
+    <item>his son</item>
+    <item>his family</item>
+    <item>her daughter</item>
+    <item>her son</item>
+    <item>her family</item>
+  </string-array>
+  <string-array name="quest_adjective">
+    <item>powerful</item>
+    <item>magical</item>
+    <item>sacred</item>
+    <item>valuable</item>
+  </string-array>
+  <string-array name="quest_name">
+    <item>[C][v][c][v][cc]</item>
+  </string-array>
+  <string-array name="quest_C">
+    <item>B</item>
+    <item>D</item>
+    <item>F</item>
+    <item>G</item>
+    <item>H</item>
+    <item>J</item>
+    <item>K</item>
+    <item>L</item>
+    <item>M</item>
+    <item>N</item>
+    <item>P</item>
+    <item>R</item>
+    <item>S</item>
+    <item>T</item>
+    <item>V</item>
+    <item>W</item>
+    <item>Wh</item>
+    <item>Y</item>
+    <item>Z</item>
+    <item>Th</item>
+    <item>Ch</item>
+    <item>Sh</item>
+    <item>Zh</item>
+    <item>[V][c]</item>
+  </string-array>
+  <string-array name="quest_V">
+    <item>A</item>
+    <item>A</item>
+    <item>A</item>
+    <item>E</item>
+    <item>E</item>
+    <item>E</item>
+    <item>I</item>
+    <item>I</item>
+    <item>I</item>
+    <item>O</item>
+    <item>O</item>
+    <item>O</item>
+    <item>U</item>
+    <item>U</item>
+    <item>U</item>
+    <item>Ae</item>
+    <item>Ee</item>
+    <item>Ie</item>
+    <item>Oe</item>
+    <item>Ue</item>
+    <item>Oo</item>
+    <item>Au</item>
+    <item>Oi</item>
+    <item>Ai</item>
+    <item>Ea</item>
+  </string-array>
+  <string-array name="quest_c">
+    <item>b</item>
+    <item>d</item>
+    <item>f</item>
+    <item>g</item>
+    <item>h</item>
+    <item>j</item>
+    <item>k</item>
+    <item>l</item>
+    <item>m</item>
+    <item>n</item>
+    <item>p</item>
+    <item>r</item>
+    <item>s</item>
+    <item>t</item>
+    <item>v</item>
+    <item>w</item>
+    <item>z</item>
+    <item>th</item>
+    <item>ch</item>
+    <item>sh</item>
+    <item>ng</item>
+  </string-array>
+  <string-array name="quest_v">
+    <item>a</item>
+    <item>a</item>
+    <item>a</item>
+    <item>e</item>
+    <item>e</item>
+    <item>e</item>
+    <item>i</item>
+    <item>i</item>
+    <item>i</item>
+    <item>o</item>
+    <item>o</item>
+    <item>o</item>
+    <item>u</item>
+    <item>u</item>
+    <item>u</item>
+    <item>ae</item>
+    <item>ee</item>
+    <item>ie</item>
+    <item>oe</item>
+    <item>ue</item>
+    <item>oo</item>
+    <item>au</item>
+    <item>oi</item>
+    <item>ai</item>
+    <item>ea</item>
+  </string-array>
+  <string-array name="quest_cc">
+    <item></item>
+    <item></item>
+    <item></item>
+    <item></item>
+    <item></item>
+    <item>y</item>
+    <item>[c]</item>
+    <item>[c][v]</item>
+    <item>[c][v]</item>
+    <item>[c][v][cc]</item>
+  </string-array>
+</resources>
