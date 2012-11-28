@@ -1,4 +1,4 @@
-package org.eatabrick.adventurequest;
+package net.honeybadgerlabs.adventurequest;
 
 import android.app.Notification;
 import android.app.NotificationManager;
