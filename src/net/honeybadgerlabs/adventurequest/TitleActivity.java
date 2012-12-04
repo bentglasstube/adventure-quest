@@ -24,16 +24,21 @@ public class TitleActivity extends Activity {
   private static final int QUEST_ABANDON  = 4;
   private static final int LEVEL_BASE     = 300000;
 
+  public static final String ACTION_SUCCESS = "QuestSuccess";
+  public static final String ACTION_FAILURE = "QuestFailure";
+
   private SharedPreferences settings;
   private Random rng = new Random();
   private CountDownTimer timer;
   private AlarmManager alarm;
-  private PendingIntent completeIntent;
+  private PendingIntent successIntent;
+  private PendingIntent failureIntent;
 
   private int charLevel;
   private int charXP;
   private String questDescription;
   private long questEnd;
+  private long questFailEnd;
   private int questXP;
   private int questStatus;
 
@@ -46,7 +51,8 @@ public class TitleActivity extends Activity {
 
     settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-    completeIntent = PendingIntent.getBroadcast(this, 0, new Intent(this, CompleteReceiver.class), 0);
+    successIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_SUCCESS, null, this, CompleteReceiver.class), 0);
+    failureIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_FAILURE, null, this, CompleteReceiver.class), 0);
   }
 
   @Override public void onResume() {
@@ -88,6 +94,7 @@ public class TitleActivity extends Activity {
     questDescription = settings.getString("quest_desc", getString(R.string.welcome));
     questStatus      = settings.getInt("quest_status", QUEST_NONE);
     questEnd         = settings.getLong("quest_end", 0);
+    questFailEnd     = settings.getLong("quest_fail_end", 0);
     questXP          = settings.getInt("quest_xp", 0);
 
     if (questStatus == QUEST_PROGRESS) startTimer();
@@ -101,6 +108,7 @@ public class TitleActivity extends Activity {
     editor.putString("quest_desc", questDescription);
     editor.putInt("quest_status", questStatus);
     editor.putLong("quest_end", questEnd);
+    editor.putLong("quest_fail_end", questFailEnd);
     editor.putInt("quest_xp", questXP);
 
     editor.commit();
@@ -136,6 +144,9 @@ public class TitleActivity extends Activity {
       setText(R.id.quest_status, String.format(getString(R.string.status_progress), getQuestETA()));
       setText(R.id.quest_action, R.string.action_abandon);
     }
+
+    // TODO: remove from release
+    ((TextView) findViewById(R.id.quest_status)).setAllCaps(questFailEnd > 0);
   }
 
   private String getQuestETA() {
@@ -170,7 +181,7 @@ public class TitleActivity extends Activity {
   }
 
   private void startTimer() {
-    long time = questEnd - SystemClock.elapsedRealtime();
+    long time = (questFailEnd > 0 ? questFailEnd : questEnd) - SystemClock.elapsedRealtime();
 
     if (time > 0) {
       timer = new CountDownTimer(time, 1000) {
@@ -183,7 +194,11 @@ public class TitleActivity extends Activity {
       }.start();
 
       // set alarm for notification
-      alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, questEnd, completeIntent);
+      if (questFailEnd > 0) {
+        alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, questFailEnd, failureIntent);
+      } else {
+        alarm.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, questEnd, successIntent);
+      }
     } else {
       completeQuest();
     }
@@ -217,13 +232,22 @@ public class TitleActivity extends Activity {
   }
 
   private void beginQuest() {
-    // pick time and xp
     double factor = rng.nextDouble() / 5.0 + 0.2;
     long time = (long) ((double) timeToLevel(charLevel) * factor);
+    long start = SystemClock.elapsedRealtime();
 
     questDescription = generateQuestDescription();
-    questEnd = SystemClock.elapsedRealtime() + time;
+    questEnd = start + time;
     questXP  = (int) (factor * 100);
+
+    if (rng.nextFloat() < 0.10) {
+      double early = rng.nextGaussian() * 0.25 + 0.60;
+      if (early > 1.0) early = 0.99;
+
+      questFailEnd = start + (long) ((double) time * early);
+    } else {
+      questFailEnd = 0;
+    }
 
     questStatus = QUEST_PROGRESS;
     updateDisplay();
@@ -233,8 +257,7 @@ public class TitleActivity extends Activity {
 
   private void completeQuest() {
     if (questEnd > 0) {
-      // 10% chance of failure
-      if (rng.nextFloat() > 0.10) {
+      if (questFailEnd == 0) {
         charXP += questXP;
         if (charXP > 100) {
           charXP -= 100;
@@ -248,6 +271,7 @@ public class TitleActivity extends Activity {
     }
 
     questEnd = 0;
+    questFailEnd = 0;
     updateDisplay();
   }
 
@@ -256,6 +280,7 @@ public class TitleActivity extends Activity {
     if (charXP < 0) charXP = 0;
 
     questEnd = 0;
+    questFailEnd = 0;
     questXP = 0;
     questStatus = QUEST_ABANDON;
     timer.cancel();
