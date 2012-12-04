@@ -147,9 +147,6 @@ public class TitleActivity extends Activity {
       setText(R.id.quest_status, String.format(getString(R.string.status_progress), getQuestETA()));
       setText(R.id.quest_action, R.string.action_abandon);
     }
-
-    // TODO: remove from release
-    ((TextView) findViewById(R.id.quest_status)).setAllCaps(questFailEnd > 0);
   }
 
   private String getQuestETA() {
