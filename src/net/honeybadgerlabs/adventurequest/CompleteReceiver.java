@@ -15,7 +15,7 @@ import android.util.Log;
 
 public class CompleteReceiver extends BroadcastReceiver {
   private static final String TAG = "CompleteReceiver";
-  private static final int ID_NOTIFICATION = 0;
+  public static final int ID_NOTIFICATION = 0;
 
   @Override public void onReceive(Context context, Intent intent) {
     Notification notification;

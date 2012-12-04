@@ -2,6 +2,7 @@ package net.honeybadgerlabs.adventurequest;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -73,10 +74,12 @@ public class TitleActivity extends Activity {
 
   public void setNotify(boolean notify) {
     SharedPreferences.Editor editor = settings.edit();
-
     editor.putBoolean("notify", notify);
-
     editor.commit();
+
+    if (notify == false) {
+      ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(CompleteReceiver.ID_NOTIFICATION);
+    }
   }
 
   public void onAction(View v) {
