@@ -61,7 +61,7 @@ public class TitleActivity extends Activity {
     super.onPause();
 
     saveGame();
-    timer.cancel();
+    if (timer != null) timer.cancel();
     setNotify(true);
   }
 
