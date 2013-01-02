@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
@@ -12,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import java.util.Random;
 import java.util.Vector;
 
 public class TitleActivity extends FragmentActivity {
+  private static final String TAG         = "TitleActivity";
   private static final int LEVEL_BASE     = 300000;
 
   public static final String ACTION_SUCCESS = "QuestSuccess";
@@ -48,6 +51,25 @@ public class TitleActivity extends FragmentActivity {
   }
 
   private List<UpdateListener> listeners;
+
+  private class LoadArchivesTask extends AsyncTask<Void, Void, Void> {
+    protected Void doInBackground(Void... dummy) {
+      archives.load();
+      return null;
+    }
+
+    protected void onPreExecute() {
+      archives.clear();
+      archives.setNotifyOnChange(false);
+    }
+
+    protected void onPostExecute(Void dummy) {
+      archives.setNotifyOnChange(true);
+      archives.notifyDataSetChanged();
+
+      Log.d(TAG, "Loaded " + archives.getCount() + " quests from archives");
+    }
+  }
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -130,7 +152,7 @@ public class TitleActivity extends FragmentActivity {
 
     if (questStatus == Quest.STATUS_PROGRESS) startTimer();
 
-    archives.load();
+    new LoadArchivesTask().execute();
   }
 
   private void saveGame() {
