@@ -12,4 +12,6 @@
   <string name="welcome">Welcome to Adventure Quest!  Press the button below to start your epic journey.</string>
   <string name="notification_success">Quest completed!</string>
   <string name="notification_failure">Quest failed.</string>
+  <string name="tab_current">Current Quest</string>
+  <string name="tab_history">Quest Archives</string>
 </resources>

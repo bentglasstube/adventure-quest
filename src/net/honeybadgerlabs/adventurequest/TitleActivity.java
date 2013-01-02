@@ -1,6 +1,5 @@
 package net.honeybadgerlabs.adventurequest;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,19 +9,18 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.text.method.ScrollingMovementMethod;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import java.lang.Math;
+import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
-public class TitleActivity extends Activity {
-  private static final int QUEST_NONE     = 0;
-  private static final int QUEST_FAILED   = 1;
-  private static final int QUEST_COMPLETE = 2;
-  private static final int QUEST_PROGRESS = 3;
-  private static final int QUEST_ABANDON  = 4;
+public class TitleActivity extends FragmentActivity {
   private static final int LEVEL_BASE     = 300000;
 
   public static final String ACTION_SUCCESS = "QuestSuccess";
@@ -34,6 +32,8 @@ public class TitleActivity extends Activity {
   private AlarmManager alarm;
   private PendingIntent successIntent;
   private PendingIntent failureIntent;
+  private PagerAdapter adapter;
+  private QuestAdapter archives;
 
   private int charLevel;
   private int charXP;
@@ -43,17 +43,32 @@ public class TitleActivity extends Activity {
   private int questXP;
   private int questStatus;
 
+  public interface UpdateListener {
+    public void onUpdate(String description, int status, long end);
+  }
+
+  private List<UpdateListener> listeners;
+
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.title);
 
     findViewById(R.id.stat_experience).setEnabled(false);
-    ((TextView) findViewById(R.id.quest_description)).setMovementMethod(new ScrollingMovementMethod());
 
     settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
     successIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_SUCCESS, null, this, CompleteReceiver.class), 0);
     failureIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_FAILURE, null, this, CompleteReceiver.class), 0);
+
+    List<Fragment> fragments = new Vector<Fragment>();
+    fragments.add(Fragment.instantiate(this, CurrentFragment.class.getName()));
+    fragments.add(Fragment.instantiate(this, HistoryFragment.class.getName()));
+
+    adapter = new PagerAdapter(this, getSupportFragmentManager(), fragments);
+    ((ViewPager) findViewById(R.id.pager)).setAdapter(adapter);
+
+    listeners = new Vector<UpdateListener>();
+    archives = new QuestAdapter(this);
   }
 
   @Override public void onResume() {
@@ -83,11 +98,24 @@ public class TitleActivity extends Activity {
   }
 
   public void onAction(View v) {
-    if (questStatus == QUEST_PROGRESS) {
+    if (questStatus == Quest.STATUS_PROGRESS) {
       abandonQuest();
     } else {
       beginQuest();
     }
+  }
+
+  public void addUpdateListener(UpdateListener listener) {
+    listeners.add(listener);
+    updateDisplay();
+  }
+
+  public void removeUpdateListener(UpdateListener listener) {
+    listeners.remove(listener);
+  }
+
+  public QuestAdapter getArchiveAdapter() {
+    return archives;
   }
 
   private void loadGame() {
@@ -95,12 +123,14 @@ public class TitleActivity extends Activity {
     charXP    = settings.getInt("char_xp", 0);
 
     questDescription = settings.getString("quest_desc", getString(R.string.welcome));
-    questStatus      = settings.getInt("quest_status", QUEST_NONE);
+    questStatus      = settings.getInt("quest_status", Quest.STATUS_NONE);
     questEnd         = settings.getLong("quest_end", 0);
     questFailEnd     = settings.getLong("quest_fail_end", 0);
     questXP          = settings.getInt("quest_xp", 0);
 
-    if (questStatus == QUEST_PROGRESS) startTimer();
+    if (questStatus == Quest.STATUS_PROGRESS) startTimer();
+
+    archives.load();
   }
 
   private void saveGame() {
@@ -115,6 +145,8 @@ public class TitleActivity extends Activity {
     editor.putInt("quest_xp", questXP);
 
     editor.commit();
+
+    archives.save();
   }
 
   private void setText(int id, String text) {
@@ -127,48 +159,11 @@ public class TitleActivity extends Activity {
 
   private void updateDisplay() {
     setText(R.id.stat_level, String.format(getString(R.string.stat_level), charLevel));
-    setText(R.id.quest_description, questDescription);
 
     ((ProgressBar) findViewById(R.id.stat_experience)).setProgress(charXP);
 
-    if (questStatus == QUEST_NONE) {
-      setText(R.id.quest_status, R.string.status_none);
-      setText(R.id.quest_action, R.string.action_new);
-    } else if (questStatus == QUEST_FAILED) {
-      setText(R.id.quest_status, R.string.status_failed);
-      setText(R.id.quest_action, R.string.action_new);
-    } else if (questStatus == QUEST_COMPLETE) {
-      setText(R.id.quest_status, R.string.status_complete);
-      setText(R.id.quest_action, R.string.action_new);
-    } else if (questStatus == QUEST_ABANDON) {
-      setText(R.id.quest_status, R.string.status_abandon);
-      setText(R.id.quest_action, R.string.action_new);
-    } else {
-      setText(R.id.quest_status, String.format(getString(R.string.status_progress), getQuestETA()));
-      setText(R.id.quest_action, R.string.action_abandon);
-    }
-  }
-
-  private String getQuestETA() {
-    long ttl = questEnd - SystemClock.elapsedRealtime();
-
-    if (ttl < 1000) {
-      return "0s";
-    } else {
-      long days    = ttl / 86400000;
-      long hours   = (ttl / 3600000) % 24;
-      long minutes = (ttl /   60000) % 60;
-      long seconds = (ttl /    1000) % 60;
-
-      if (days > 0) {
-        return String.format("%dd%02dh%02dm%02d", days, hours, minutes, seconds);
-      } else if (hours > 0) {
-        return String.format("%dh%02dm%02ds", hours, minutes, seconds);
-      } else if (minutes > 0) {
-        return String.format("%dm%02ds", minutes, seconds);
-      } else {
-        return String.format("%ds", seconds);
-      }
+    for (UpdateListener listener : listeners) {
+      listener.onUpdate(questDescription, questStatus, questEnd);
     }
   }
 
@@ -249,7 +244,7 @@ public class TitleActivity extends Activity {
       questFailEnd = 0;
     }
 
-    questStatus = QUEST_PROGRESS;
+    questStatus = Quest.STATUS_PROGRESS;
     updateDisplay();
 
     startTimer();
@@ -264,11 +259,13 @@ public class TitleActivity extends Activity {
           charLevel += 1;
         }
 
-        questStatus = QUEST_COMPLETE;
+        questStatus = Quest.STATUS_COMPLETE;
       } else {
-        questStatus = QUEST_FAILED;
+        questStatus = Quest.STATUS_FAILED;
       }
     }
+
+    archives.insert(new Quest(questDescription, questStatus), 0);
 
     questEnd = 0;
     questFailEnd = 0;
@@ -282,8 +279,10 @@ public class TitleActivity extends Activity {
     questEnd = 0;
     questFailEnd = 0;
     questXP = 0;
-    questStatus = QUEST_ABANDON;
+    questStatus = Quest.STATUS_ABANDON;
     timer.cancel();
+
+    archives.insert(new Quest(questDescription, questStatus), 0);
 
     updateDisplay();
   }
