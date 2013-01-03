@@ -25,6 +25,7 @@ import java.util.Vector;
 public class TitleActivity extends FragmentActivity {
   private static final String TAG         = "TitleActivity";
   private static final int LEVEL_BASE     = 300000;
+  private static final int ANIMATION_STEP = 25;
 
   public static final String ACTION_SUCCESS = "QuestSuccess";
   public static final String ACTION_FAILURE = "QuestFailure";
@@ -37,6 +38,7 @@ public class TitleActivity extends FragmentActivity {
   private PendingIntent failureIntent;
   private PagerAdapter adapter;
   private QuestAdapter archives;
+  private ProgressBar expBar;
 
   private int charLevel;
   private int charXP;
@@ -75,7 +77,7 @@ public class TitleActivity extends FragmentActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.title);
 
-    findViewById(R.id.stat_experience).setEnabled(false);
+    expBar = (ProgressBar) findViewById(R.id.stat_experience);
 
     settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -97,8 +99,10 @@ public class TitleActivity extends FragmentActivity {
     super.onResume();
 
     loadGame();
-    updateDisplay();
+    updateDisplay(true);
     setNotify(false);
+
+    if (questStatus == Quest.STATUS_PROGRESS) startTimer();
   }
 
   @Override public void onPause() {
@@ -129,7 +133,7 @@ public class TitleActivity extends FragmentActivity {
 
   public void addUpdateListener(UpdateListener listener) {
     listeners.add(listener);
-    updateDisplay();
+    updateDisplay(false);
   }
 
   public void removeUpdateListener(UpdateListener listener) {
@@ -149,8 +153,6 @@ public class TitleActivity extends FragmentActivity {
     questEnd         = settings.getLong("quest_end", 0);
     questFailEnd     = settings.getLong("quest_fail_end", 0);
     questXP          = settings.getInt("quest_xp", 0);
-
-    if (questStatus == Quest.STATUS_PROGRESS) startTimer();
 
     new LoadArchivesTask().execute();
   }
@@ -179,10 +181,11 @@ public class TitleActivity extends FragmentActivity {
     ((TextView) findViewById(id)).setText(text);
   }
 
-  private void updateDisplay() {
-    setText(R.id.stat_level, String.format(getString(R.string.stat_level), charLevel));
-
-    ((ProgressBar) findViewById(R.id.stat_experience)).setProgress(charXP);
+  private void updateDisplay(boolean instantXP) {
+    if (instantXP) {
+      setText(R.id.stat_level, String.format(getString(R.string.stat_level), charLevel));
+      expBar.setProgress(charXP);
+    }
 
     for (UpdateListener listener : listeners) {
       listener.onUpdate(questDescription, questStatus, questEnd);
@@ -203,7 +206,7 @@ public class TitleActivity extends FragmentActivity {
     if (time > 0) {
       timer = new CountDownTimer(time, 1000) {
         public void onTick(long millisUntilFinished) {
-          updateDisplay();
+          updateDisplay(false);
         }
         public void onFinish() {
           completeQuest();
@@ -267,7 +270,7 @@ public class TitleActivity extends FragmentActivity {
     }
 
     questStatus = Quest.STATUS_PROGRESS;
-    updateDisplay();
+    updateDisplay(false);
 
     startTimer();
   }
@@ -275,14 +278,23 @@ public class TitleActivity extends FragmentActivity {
   private void completeQuest() {
     if (questEnd > 0) {
       if (questFailEnd == 0) {
-        charXP += questXP;
-        if (charXP > 100) {
-          charXP -= 100;
-          charLevel += 1;
+        if (charXP + questXP >= 100) {
+          int before = 100 - charXP;
+          int after = questXP - before;
+
+          charLevel++;
+          charXP += questXP - 100;
+
+          animateLevelUp(before, after);
+        } else {
+          animateXPGain(questXP);
+          charXP += questXP;
         }
 
+        Log.d(TAG, "Quest complete!");
         questStatus = Quest.STATUS_COMPLETE;
       } else {
+        Log.d(TAG, "Quest failed!");
         questStatus = Quest.STATUS_FAILED;
       }
     }
@@ -291,12 +303,15 @@ public class TitleActivity extends FragmentActivity {
 
     questEnd = 0;
     questFailEnd = 0;
-    updateDisplay();
+    updateDisplay(false);
   }
 
   private void abandonQuest() {
-    charXP -= questXP / 8;
-    if (charXP < 0) charXP = 0;
+    int loss = questXP / 8;
+    if (loss > charXP) loss = charXP;
+
+    animateXPLoss(loss);
+    charXP -= loss;
 
     questEnd = 0;
     questFailEnd = 0;
@@ -306,6 +321,43 @@ public class TitleActivity extends FragmentActivity {
 
     archives.insert(new Quest(questDescription, questStatus), 0);
 
-    updateDisplay();
+    updateDisplay(false);
+  }
+
+  private void animateXP(int count, final int diff) {
+    new CountDownTimer(count * ANIMATION_STEP, ANIMATION_STEP) {
+      public void onTick(long millisUntilFinished) {
+        expBar.incrementProgressBy(diff);
+      }
+
+      public void onFinish() {
+        expBar.setProgress(charXP);
+      }
+    }.start();
+  }
+
+  private void animateXPGain(int gain) {
+    Log.d(TAG, "Gain " + gain + " XP");
+    animateXP(gain, 1);
+  }
+
+  private void animateXPLoss(int loss) {
+    animateXP(loss, -1);
+  }
+
+  private void animateLevelUp(int before, final int after) {
+    new CountDownTimer(before * ANIMATION_STEP, ANIMATION_STEP) {
+      public void onTick(long millisUntilFinished) {
+        expBar.incrementProgressBy(1);
+      }
+
+      public void onFinish() {
+        // TODO level increase animation
+        setText(R.id.stat_level, String.format(getString(R.string.stat_level), charLevel));
+
+        expBar.setProgress(0);
+        animateXPGain(after);
+      }
+    }.start();
   }
 }
