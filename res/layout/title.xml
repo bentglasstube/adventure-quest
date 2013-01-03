@@ -15,9 +15,8 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="center" />
-  <SeekBar android:id="@+id/stat_experience"
-    android:clickable="false"
-    android:thumb="@drawable/nothing"
+  <ProgressBar android:id="@+id/stat_experience"
+    style="?android:attr/progressBarStyleHorizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" />
   <FrameLayout android:padding="15sp"
