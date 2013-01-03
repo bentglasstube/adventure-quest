@@ -12,6 +12,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
@@ -285,6 +286,7 @@ public class TitleActivity extends FragmentActivity {
           charLevel++;
           charXP += questXP - 100;
 
+          levelUp();
           animateLevelUp(before, after);
         } else {
           animateXPGain(questXP);
@@ -352,12 +354,17 @@ public class TitleActivity extends FragmentActivity {
       }
 
       public void onFinish() {
-        // TODO level increase animation
         setText(R.id.stat_level, String.format(getString(R.string.stat_level), charLevel));
 
         expBar.setProgress(0);
         animateXPGain(after);
       }
     }.start();
+  }
+
+  private void levelUp() {
+    FragmentManager fm = getSupportFragmentManager();
+    LevelUpDialog dialog = new LevelUpDialog(charLevel);
+    dialog.show(fm, "fragment_level_up");
   }
 }
