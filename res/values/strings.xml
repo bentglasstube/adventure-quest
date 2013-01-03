@@ -14,4 +14,5 @@
   <string name="notification_failure">Quest failed.</string>
   <string name="tab_current">Current Quest</string>
   <string name="tab_history">Quest Archives</string>
+  <string name="levelup_message">Improve an attribute</string>
 </resources>

@@ -12,6 +12,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
@@ -279,6 +280,7 @@ public class TitleActivity extends FragmentActivity {
         if (charXP > 100) {
           charXP -= 100;
           charLevel += 1;
+          levelUp();
         }
 
         questStatus = Quest.STATUS_COMPLETE;
@@ -307,5 +309,11 @@ public class TitleActivity extends FragmentActivity {
     archives.insert(new Quest(questDescription, questStatus), 0);
 
     updateDisplay();
+  }
+
+  private void levelUp() {
+    FragmentManager fm = getSupportFragmentManager();
+    LevelUpDialog dialog = new LevelUpDialog(charLevel);
+    dialog.show(fm, "fragment_level_up");
   }
 }
