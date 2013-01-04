@@ -39,6 +39,7 @@ public class TitleActivity extends FragmentActivity {
   private PendingIntent failureIntent;
   private PagerAdapter adapter;
   private QuestAdapter archives;
+  private StatAdapter attributes;
   private ProgressBar expBar;
 
   private int charLevel;
@@ -74,6 +75,23 @@ public class TitleActivity extends FragmentActivity {
     }
   }
 
+  private class LoadProfileTask extends AsyncTask<Void, Void, Void> {
+    protected Void doInBackground(Void... dummy) {
+      attributes.load();
+      return null;
+    }
+
+    protected void onPreExecute() {
+      attributes.clear();
+      attributes.setNotifyOnChange(false);
+    }
+
+    protected void onPostExecute(Void dummy) {
+      attributes.setNotifyOnChange(true);
+      attributes.notifyDataSetChanged();
+    }
+  }
+
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.title);
@@ -87,6 +105,7 @@ public class TitleActivity extends FragmentActivity {
 
     List<Fragment> fragments = new Vector<Fragment>();
     fragments.add(Fragment.instantiate(this, CurrentFragment.class.getName()));
+    fragments.add(Fragment.instantiate(this, ProfileFragment.class.getName()));
     fragments.add(Fragment.instantiate(this, HistoryFragment.class.getName()));
 
     adapter = new PagerAdapter(this, getSupportFragmentManager(), fragments);
@@ -94,6 +113,7 @@ public class TitleActivity extends FragmentActivity {
 
     listeners = new Vector<UpdateListener>();
     archives = new QuestAdapter(this);
+    attributes = new StatAdapter(this);
   }
 
   @Override public void onResume() {
@@ -132,6 +152,12 @@ public class TitleActivity extends FragmentActivity {
     }
   }
 
+  public void onSpendClick(View v) {
+    if (charLevel > attributes.totalPoints()) {
+      levelUp();
+    }
+  }
+
   public void addUpdateListener(UpdateListener listener) {
     listeners.add(listener);
     updateDisplay(false);
@@ -141,8 +167,29 @@ public class TitleActivity extends FragmentActivity {
     listeners.remove(listener);
   }
 
+  public void levelUp() {
+    updatePointsButton();
+
+    FragmentManager fm = getSupportFragmentManager();
+    LevelUpDialog dialog = new LevelUpDialog(charLevel);
+    dialog.show(fm, "fragment_level_up");
+  }
+
+  public void addStat(String name) {
+    attributes.addStat(name);
+    updatePointsButton();
+  }
+
+  public int getCharLevel() {
+    return charLevel;
+  }
+
   public QuestAdapter getArchiveAdapter() {
     return archives;
+  }
+
+  public StatAdapter getStatAdapter() {
+    return attributes;
   }
 
   private void loadGame() {
@@ -156,6 +203,7 @@ public class TitleActivity extends FragmentActivity {
     questXP          = settings.getInt("quest_xp", 0);
 
     new LoadArchivesTask().execute();
+    new LoadProfileTask().execute();
   }
 
   private void saveGame() {
@@ -172,6 +220,11 @@ public class TitleActivity extends FragmentActivity {
     editor.commit();
 
     archives.save();
+    attributes.save();
+  }
+
+  private void updatePointsButton() {
+    ((ProfileFragment) adapter.getItem(1)).updateButton();
   }
 
   private void setText(int id, String text) {
@@ -360,11 +413,5 @@ public class TitleActivity extends FragmentActivity {
         animateXPGain(after);
       }
     }.start();
-  }
-
-  private void levelUp() {
-    FragmentManager fm = getSupportFragmentManager();
-    LevelUpDialog dialog = new LevelUpDialog(charLevel);
-    dialog.show(fm, "fragment_level_up");
   }
 }

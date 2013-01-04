@@ -7,12 +7,14 @@
   <string name="status_progress">Complete in %s</string>
   <string name="status_abandon">Abandoned</string>
   <string name="status_none">Welcome</string>
+  <string name="profile_label_stats">Attribute Bonuses</string>
   <string name="action_abandon">Abandon Quest</string>
   <string name="action_new">New Quest</string>
   <string name="welcome">Welcome to Adventure Quest!  Press the button below to start your epic journey.</string>
   <string name="notification_success">Quest completed!</string>
   <string name="notification_failure">Quest failed.</string>
   <string name="tab_current">Current Quest</string>
+  <string name="tab_profile">Character Profile</string>
   <string name="tab_history">Quest Archives</string>
   <string name="levelup_message">Improve an attribute</string>
 </resources>

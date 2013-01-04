@@ -33,6 +33,8 @@ public class PagerAdapter extends FragmentPagerAdapter {
       case 0:
         return mContext.getString(R.string.tab_current);
       case 1:
+        return mContext.getString(R.string.tab_profile);
+      case 2:
         return mContext.getString(R.string.tab_history);
       default:
         return "";

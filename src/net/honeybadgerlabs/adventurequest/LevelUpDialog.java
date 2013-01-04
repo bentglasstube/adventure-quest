@@ -36,8 +36,7 @@ public class LevelUpDialog extends DialogFragment {
            .setItems(choices, new DialogInterface.OnClickListener() {
              public void onClick(DialogInterface dialog, int id) {
                Log.d(TAG, "chose " + choices[id]);
-
-               // TODO record attribute choice
+               ((TitleActivity) getDialog().getOwnerActivity()).addStat(choices[id]);
              }
            });
 
