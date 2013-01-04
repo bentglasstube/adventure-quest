@@ -26,8 +26,14 @@ public class ProfileFragment extends Fragment {
 
   @Override public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
+
     adapter = ((TitleActivity) getActivity()).getStatAdapter();
     listView.setAdapter(adapter);
+  }
+
+  @Override public void onResume() {
+    super.onResume();
+
     updateButton();
   }
 

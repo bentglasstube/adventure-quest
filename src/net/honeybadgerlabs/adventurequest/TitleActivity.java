@@ -89,6 +89,7 @@ public class TitleActivity extends FragmentActivity {
     protected void onPostExecute(Void dummy) {
       attributes.setNotifyOnChange(true);
       attributes.notifyDataSetChanged();
+      updatePointsButton();
     }
   }
 
