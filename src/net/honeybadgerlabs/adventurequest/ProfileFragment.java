@@ -32,7 +32,9 @@ public class ProfileFragment extends Fragment {
   }
 
   public void updateButton() {
-    try {
+    TitleActivity activity = (TitleActivity) getActivity();
+
+    if (activity != null) {
       int points = ((TitleActivity) getActivity()).getCharLevel() - adapter.totalPoints() - 1;
 
       if (points > 0) {
@@ -42,7 +44,6 @@ public class ProfileFragment extends Fragment {
       } else {
         button.setVisibility(View.GONE);
       }
-    } catch (NullPointerException e) {
     }
   }
 }
