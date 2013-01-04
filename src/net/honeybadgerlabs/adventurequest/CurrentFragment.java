@@ -66,14 +66,15 @@ public class CurrentFragment extends Fragment implements TitleActivity.UpdateLis
 
   private String getQuestETA(long end) {
     long ttl = end - SystemClock.elapsedRealtime();
+    long s = (long) Math.ceil(ttl / 1000.0f);
 
-    if (ttl < 1000) {
+    if (s < 1) {
       return "0s";
     } else {
-      long days    = ttl / 86400000;
-      long hours   = (ttl / 3600000) % 24;
-      long minutes = (ttl /   60000) % 60;
-      long seconds = (ttl /    1000) % 60;
+      long days    = (s / 86400);
+      long hours   = (s /  3600) % 24;
+      long minutes = (s /    60) % 60;
+      long seconds = (s /     1) % 60;
 
       if (days > 0) {
         return String.format("%dd%02dh%02dm%02d", days, hours, minutes, seconds);

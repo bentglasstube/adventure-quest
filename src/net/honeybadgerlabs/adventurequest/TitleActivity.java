@@ -258,7 +258,7 @@ public class TitleActivity extends FragmentActivity {
     long time = (questFailEnd > 0 ? questFailEnd : questEnd) - SystemClock.elapsedRealtime();
 
     if (time > 0) {
-      timer = new CountDownTimer(time, 1000) {
+      timer = new CountDownTimer(time, 100) {
         public void onTick(long millisUntilFinished) {
           updateDisplay(false);
         }
