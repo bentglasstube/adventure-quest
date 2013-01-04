@@ -7,18 +7,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.GridView;
 import android.widget.TextView;
 
 public class ProfileFragment extends Fragment {
-  private ListView listView;
+  private GridView listView;
   private TextView button;
   private StatAdapter adapter;
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.profile, container, false);
 
-    listView = (ListView) view.findViewById(R.id.attribute_list);
+    listView = (GridView) view.findViewById(R.id.attribute_list);
     button = (TextView) view.findViewById(R.id.spend_points);
 
     return view;
